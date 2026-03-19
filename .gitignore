@@ -15,5 +15,8 @@ models/
 # Reports & exports
 reports/
 
+# Raw data files (may contain exposed tokens/credentials from phishing datasets)
+data/*.csv
+
 # IDE
 .vscode/
