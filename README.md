@@ -3,9 +3,9 @@
 A desktop app that analyzes emails, domains, and IPs for phishing threats using machine learning and AI.
 
 ## Features
-- Paste or upload an email, IP, or domain — auto-detected
+- Paste or upload an email, IP, or domain (auto-detected)
 - Risk score (Low / Medium / High / Critical)
-- "Explain with AI" — local AI gives a plain-English summary
+- "Explain with AI" - local AI gives a plain-English summary
 - Image upload — extracts text from email screenshots via OCR
 - Export results as PDF
 
