@@ -1,0 +1,19 @@
+# Secrets & local config
+.env
+CLAUDE.md
+config.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+
+# ML model cache
+models/
+
+# Reports & exports
+reports/
+
+# IDE
+.vscode/
