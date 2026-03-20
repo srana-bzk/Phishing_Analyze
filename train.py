@@ -16,6 +16,9 @@ import joblib
 import io
 import requests
 import pandas as pd
+from dotenv import load_dotenv
+
+load_dotenv()
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
@@ -63,35 +66,21 @@ def download_dataset():
     except Exception as e:
         print(f"  ✗ {e}")
 
-    # Method B: HuggingFace Hub parquet (ealvaradob — no config param)
-    print("  Trying ealvaradob/phishing-dataset via Hub tree…")
+    # Method B: ealvaradob/phishing-dataset — texts.json (emails subset)
+    print("  Trying ealvaradob/phishing-dataset via texts.json…")
     try:
-        tree = requests.get(
-            "https://huggingface.co/api/datasets/ealvaradob/phishing-dataset/tree/main",
-            timeout=30,
-        ).json()
-        parquets = [e for e in tree
-                    if e.get("path", "").endswith(".parquet")
-                    and "email" in e.get("path", "").lower()]
-        if not parquets:
-            parquets = [e for e in tree if e.get("path", "").endswith(".parquet")]
-        if parquets:
-            frames = []
-            for i, e in enumerate(parquets):
-                url = ("https://huggingface.co/datasets/ealvaradob/phishing-dataset"
-                       f"/resolve/main/{e['path']}")
-                print(f"    Downloading shard {i+1}/{len(parquets)}…")
-                r = requests.get(url, timeout=120)
-                r.raise_for_status()
-                frames.append(pd.read_parquet(io.BytesIO(r.content)))
-            df = pd.concat(frames, ignore_index=True)
-            text_col  = next((c for c in df.columns if "text" in c.lower()), df.columns[0])
-            label_col = next((c for c in df.columns if "label" in c.lower()), df.columns[-1])
-            texts  = df[text_col].astype(str).tolist()
-            raw    = df[label_col].tolist()
-            labels = [int(bool(v)) for v in raw]
-            print(f"  ✓ Loaded {len(texts)} emails")
-            return texts, labels
+        hf_token = os.getenv("HF_TOKEN", "")
+        headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
+        url = ("https://huggingface.co/datasets/ealvaradob/phishing-dataset"
+               "/resolve/main/texts.json")
+        r = requests.get(url, headers=headers, timeout=120)
+        r.raise_for_status()
+        data = r.json()
+        # data is a list of {"text": "...", "label": 0/1}
+        texts  = [str(item["text"]) for item in data]
+        labels = [int(bool(item["label"])) for item in data]
+        print(f"  ✓ Loaded {len(texts)} samples.")
+        return texts, labels
     except Exception as e:
         print(f"  ✗ {e}")
 
