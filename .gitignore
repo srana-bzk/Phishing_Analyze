@@ -1,6 +1,5 @@
 # Secrets & local config
 .env
-CLAUDE.md
 config.json
 
 # Python
